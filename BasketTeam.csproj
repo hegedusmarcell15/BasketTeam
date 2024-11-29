@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1A5F7ECA-04E6-4742-A21D-32BED659E598}</ProjectGuid>
+    <ProjectGuid>{389ECDA8-C390-451C-84A8-F985FFC207F3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>BasketTeam</RootNamespace>
     <AssemblyName>BasketTeam</AssemblyName>
@@ -104,7 +104,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include=".gitignore" />
+    <Content Include="Properties\.gitignore" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

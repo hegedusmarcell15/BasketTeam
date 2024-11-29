@@ -1,4 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace BasketTeam
 {
@@ -11,10 +16,10 @@ namespace BasketTeam
         public string Password;
         public string ConnectionString;
 
-        public Connect() 
-        { 
+        public Connect()    
+        {
             Host = "localhost";
-            Database = "Team";
+            Database = "team";
             User = "root";
             Password = "";
 
@@ -22,6 +27,7 @@ namespace BasketTeam
 
             Connection = new MySqlConnection(ConnectionString);
         }
+
 
     }
 }

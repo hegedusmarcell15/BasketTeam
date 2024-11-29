@@ -1,4 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
+using Org.BouncyCastle.Asn1.BC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,122 +11,135 @@ namespace BasketTeam
     internal class Program
     {
         public static Connect conn = new Connect();
-
-        // 1. Összes adat lekérdezése
         public static void GetAllData()
         {
-            using (var connection = conn.Connection)
+            conn.Connection.Open();
+
+            string sql = "SELECT * FROM `player`";
+
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+
+            MySqlDataReader dr = cmd.ExecuteReader();
+            
+            dr.Read();
+
+            do 
             {
-                connection.Open();
-
-                string sql = "SELECT * FROM `player`";
-
-                using (var cmd = new MySqlCommand(sql, connection))
-                using (var dr = cmd.ExecuteReader())
+                var player = new
                 {
-                    while (dr.Read())
-                    {
-                        var player = new
-                        {
-                            Id = dr.GetInt32(0),
-                            Name = dr.GetString(1),
-                            Height = dr.GetInt32(2),
-                            Weight = dr.GetInt32(3),
-                            CreatedTime = dr.GetDateTime(4)
-                        };
-
-                        Console.WriteLine($"Player Info: Name = {player.Name}, Height = {player.Height}cm, Weight = {player.Weight}kg");
-                    }
-                }
+                    id = dr.GetInt32(0),
+                    name = dr.GetString(1),
+                    height = dr.GetInt32(2),
+                    weight = dr.GetInt32(3),
+                    CreatedTime = dr.GetDateTime(4)
+                };
+                Console.WriteLine($"Játékos adatok: {player.name}, {player.CreatedTime}");
             }
-        }
+            while (dr.Read());
+           
 
-        // 2. Új játékos hozzáadása
-        public static void AddPlayer(string name, int height, int weight)
+            dr.Close();
+
+            
+
+            conn.Connection.Close();
+        }
+        public static void AddNewPlayer(string name, int height, int weight)
+        { 
+            try
+            {
+                conn.Connection.Open();
+
+                string sql = $"INSERT INTO `player`(`name`, `height`, `weight`) VALUES ('{name}',{height},{weight})";
+
+                MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+                cmd.ExecuteNonQuery();
+
+                conn.Connection.Close();
+            }
+
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception.Message);
+            }
+
+            
+        }
+        public static void DelPlayer(int id)
         {
-            using (var connection = conn.Connection)
-            {
-                connection.Open();
+            conn.Connection.Open();
 
-                string sql = "INSERT INTO `player` (name, height, weight, createdTime) VALUES (@name, @height, @weight, NOW())";
+            string sql = $"DELETE FROM `player` WHERE `id` = {id};";
 
-                using (var cmd = new MySqlCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@name", name);
-                    cmd.Parameters.AddWithValue("@height", height);
-                    cmd.Parameters.AddWithValue("@weight", weight);
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+            cmd.ExecuteNonQuery();
 
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    Console.WriteLine($"{rowsAffected} player(s) added successfully.");
-                }
-            }
+            conn.Connection.Close();
         }
 
-        // 3. Játékos törlése ID alapján
-        public static void DeletePlayerById(int id)
+        public static void UpdatePlayer(int id, string name, int height, int weight)
         {
-            using (var connection = conn.Connection)
-            {
-                connection.Open();
+            conn.Connection.Open();
 
-                string sql = "DELETE FROM `player` WHERE id = @id";
+            string sql = $"UPDATE `player` SET `name`='{name}',`height`={height},`weight`={weight} WHERE `id` = {id};";
 
-                using (var cmd = new MySqlCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
+            MySqlCommand cmd = new MySqlCommand(sql, conn.Connection);
+            
+            cmd.ExecuteNonQuery();
 
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    Console.WriteLine($"{rowsAffected} player(s) deleted successfully.");
-                }
-            }
+            conn.Connection.Close();
         }
-
-        // 4. Játékos módosítása ID alapján
-        public static void UpdatePlayerById(int id, string name, int height, int weight)
-        {
-            using (var connection = conn.Connection)
-            {
-                connection.Open();
-
-                string sql = "UPDATE `player` SET name = @name, height = @height, weight = @weight WHERE id = @id";
-
-                using (var cmd = new MySqlCommand(sql, connection))
-                {
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@name", name);
-                    cmd.Parameters.AddWithValue("@height", height);
-                    cmd.Parameters.AddWithValue("@weight", weight);
-
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    Console.WriteLine($"{rowsAffected} player(s) updated successfully.");
-                }
-            }
-        }
-
-        // Főprogram
         static void Main(string[] args)
         {
-            // Tesztelje a funkciókat a következőképpen:
+            //try
+            //{
+            //Console.WriteLine("Kérem a játékos nevét: ");
+            //string name = Console.ReadLine();
+            //Console.WriteLine("Kérem a játékos magasságát: ");
+            //int height = int.Parse(Console.ReadLine());
+            //Console.WriteLine("Kérem a játékos súlyát: ");
+            //int weight = int.Parse(Console.ReadLine());
+            //AddNewPlayer(name, height, weight);
+            //}
+            //catch
+            //{
+            //Console.WriteLine("Nem jó karakter");
+            //}
+            //GetAllData();
 
-            // 1. Játékosok listázása
-            Console.WriteLine("Játékosok listázása:");
-            GetAllData();
+            /* try
+             {
+                 Console.WriteLine("Kérem a játékos azonosítót a törléshez: ");
+                 int id = int.Parse(Console.ReadLine());
+                 DelPlayer(id);
 
-            // 2. Új játékos hozzáadása
-            Console.WriteLine("\nÚj játékos hozzáadása:");
-            AddPlayer("Michael Jordan", 198, 98);
+             }
+             catch (Exception e)
+             {
+                 Console.WriteLine(e.Message);
+             }*/
+            try
+            {
+                Console.WriteLine("Kérem a játékos azonosítót: ");
+                int id = int.Parse(Console.ReadLine());
 
-            // 3. Játékos törlése ID alapján
-            Console.WriteLine("\nJátékos törlése (ID = 1):");
-            DeletePlayerById(1);
+                Console.WriteLine("Kérem az új nevet: ");
+                string name = Console.ReadLine();
+                Console.WriteLine("Kérem az új magasságot: ");
+                int height = int.Parse(Console.ReadLine());
+                Console.WriteLine("Kérem az új súlyt: ");
+                int weight = int.Parse(Console.ReadLine());
 
-            // 4. Játékos módosítása ID alapján
-            Console.WriteLine("\nJátékos módosítása (ID = 2):");
-            UpdatePlayerById(2, "Updated Player", 200, 110);
+                UpdatePlayer(id, name, height, weight);
 
-            // 5. Újra listázás
-            Console.WriteLine("\nFrissített játékos lista:");
-            GetAllData();
+                Console.WriteLine("Sikeres frissítés");
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            Console.ReadKey();
         }
     }
 }
